@@ -4,7 +4,7 @@
 //#include <QtOpenGL>
 #include <GL/glut.h>  
 #include <math.h>
-
+#include<iostream>
 class Point3
 {
 public:
@@ -86,6 +86,9 @@ public:
         float d=x*b.x+y*b.y+z*b.z;
         return d;
     }
+    void dump(){
+        std::cout<<x<<" "<<y<<" "<<z<<std::endl;
+    }
 };
 
 class Camera
@@ -107,7 +110,8 @@ float getDist();
 void setShape(float viewAngle,float aspect,float Near,float Far);
 
 
-private:
+//private:
+public:
 /* 摄像机属性 */
 Point3         eye,look,up;
 Vector3        u,v,n;

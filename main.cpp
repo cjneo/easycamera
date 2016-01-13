@@ -2,14 +2,22 @@
 #include <stdlib.h>
 #include<stdio.h>
 #include<camera.h>
+#include<iostream>
+using namespace std;
 /*
 http://blog.csdn.net/hobbit1988/article/details/7956838
+*/
+
+/*
+g++ main.cpp camera.cpp -Iinclude -lGL -lglut -lGLU
 */
 static int shoulder = 0, elbow = 0;  
 static int nearplane=1;
 Camera camera;
-   float dxx=0.1;
+   float dxx=10;
    float dyy=-0.2;
+   void  RotateY(float angle);
+   void  RotateX(float angle) ;
 void init(void)   
 {  
    glClearColor (0.0, 0.0, 0.0, 0.0);  
@@ -51,11 +59,25 @@ void keyboard (unsigned char key, int x, int y)
         //  glLoadIdentity ();  
         // gluPerspective(65.0, 1, nearplane, 20.0);  
       
-         camera.roll(dxx);  
-         camera.slide(0,0,-dyy);  
+         camera.roll(dxx);
+         camera.u.dump();
+        camera.v.dump();
+         //camera.slide(0,0,-dyy);  
          glutPostRedisplay();
          printf("nearplane %d\n",nearplane);
-         break;  
+         break; 
+         
+         case 'a':
+         camera.yaw(dxx);
+         glutPostRedisplay();
+          
+         break;
+         case 's':
+         camera.pitch(dxx); 
+         glutPostRedisplay();
+          
+         break; 
+         
       case 27:  
          exit(0);  
          break;
@@ -64,7 +86,59 @@ void keyboard (unsigned char key, int x, int y)
          break;  
    }  
 }  
+//button:GLUT_LEFT_BUTTON GLUT_MIDDLE_BUTTON GLUT_RIGHT_BUTTON
+
+void mouse(int button ,int state,int x, int y){
+    static int ddx,ddy,udx,udy;
+    if(button == GLUT_LEFT_BUTTON){
+        if(state ==GLUT_DOWN){
+            cout<<"down "<< x<<" "<<y<<endl;
+            ddx=x;
+            ddy=y;
+        }
+        else if(state == GLUT_UP){
+            cout<<"up " << x << " " <<y<<endl;
+            int dx,dy;
+            dx=x-ddx;
+            dy=y-ddy;
+            RotateX(dx);  
+            RotateY(dy); 
+            glutPostRedisplay();
+        }
+    }
+}
+void RotateX(float angle)  
+{  
+    Camera &cam=camera;
+    float d=cam.getDist();  
+    int cnt=100;  
+    float theta=angle/cnt;  
+    float slide_d=-2*d*sin(theta*3.14159265/360);  
+    cam.yaw(theta/2);  
+    for(;cnt!=0;--cnt)  
+    {  
+        cam.slide(slide_d,0,0);  
+        cam.yaw(theta);  
+    }  
+    cam.yaw(-theta/2);  
+}  
   
+void  RotateY(float angle)  
+{  
+    Camera &cam=camera;
+    float d=cam.getDist();  
+    int cnt=100;  
+    float theta=angle/cnt;  
+    float slide_d=2*d*sin(theta*3.14159265/360);  
+    cam.pitch(theta/2);  
+    for(;cnt!=0;--cnt)  
+    {  
+        cam.slide(0,slide_d,0);  
+        cam.pitch(theta);  
+    }  
+    cam.pitch(-theta/2);  
+}  
+
 int main(int argc, char** argv)  
 {  
    glutInit(&argc, argv);  
@@ -73,6 +147,8 @@ int main(int argc, char** argv)
    glutInitWindowPosition (100, 100);   
    glutCreateWindow (argv[0]);  
    init ();  
+   glutMouseFunc(mouse);
+   
    glutDisplayFunc(display);   
    glutReshapeFunc(reshape);  
    glutKeyboardFunc(keyboard);  
