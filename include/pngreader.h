@@ -1,0 +1,19 @@
+
+/*
+ * pngreader.h
+ *
+ *  Created on: Feb 25, 2016
+ *      Author: jianc
+ */
+
+#ifndef PNGREADER_H
+#define PNGREADER_H
+
+#include<GL/glut.h>
+
+GLuint CreateTextureFromPng(const char* filename);
+void Settex_ver(float * ver);
+void Settex_ver_loop(float * ver,int numRec);
+void drawWall(float x,float y,float z);
+void vdrawWall(float x,float y,float z);
+#endif
