@@ -83,7 +83,14 @@ void Camera::pitch(float angle)
     n.set(sn*t.x+cs*s.x, sn*t.y+cs*s.y, sn*t.z+cs*s.z);  
     setModelViewMatrix();  
 }  
-/* 摄像机绕三个轴平移的计算函数*/  
+/* 摄像机绕三个轴平移的计算函数*/
+void Camera::trySlide(float du,float dv,float dn){
+    tryeye=eye;
+    tryeye.x+=du*u.x+dv*v.x+dn*n.x;  
+    tryeye.y+=du*u.y+dv*v.y+dn*n.y;  
+    tryeye.z+=du*u.z+dv*v.z+dn*n.z;  
+    
+}
 void Camera::slide(float du, float dv, float dn)  
 {  
     eye.x+=du*u.x+dv*v.x+dn*n.x;  

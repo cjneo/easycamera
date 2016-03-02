@@ -10,9 +10,13 @@
 #include<GL/glut.h>
 #include<math.h>
 #include<iostream>
-
+#include"randomMaze.h"
+#include<vector>
+using namespace std;
 //g++ pngreader.cpp -lpng -lGL -lglut -lGLU
 //#pragma comment(lib,"libpng16.lib")//读取png图片
+extern char dun[500][500];
+extern const int wid  ;
 GLuint CreateTextureFromPng(const char* filename) {
 	unsigned char header[8];     //8
 	int k;   //用于循环
@@ -185,17 +189,17 @@ glBegin(GL_QUADS);
 }
 	glEnd();
 }
- float ewidth=0.1,height=2,width=1;
+ float ewidth=1,height=2,width=1;
 void drawWall(float x,float y,float z){
      // float ewidth=0.1,height=2,width=1;
-  float v1[]={-width+x,0+y,0+z};
-  float v2[]={width+x,0+y,0+z};
-  float v3[]={width+x,height+y,0+z};
-  float v4[]={-width+x,height+y,0+z};
-  float v5[]={-width+x,0+y,-ewidth+z};
-  float v6[]={width+x,0+y,-ewidth+z};
-  float v7[]={width+x,height+y,-ewidth+z};
-  float v8[]={-width+x,height+y,-ewidth+z};
+  float v1[]={-width+x,0+y,ewidth +z};
+  float v2[]={width+x,0+y,ewidth +z};
+  float v3[]={width+x,height+y,ewidth +z};
+  float v4[]={-width+x,height+y,ewidth +z};
+  float v5[]={-width+x,0+y,-ewidth +z};
+  float v6[]={width+x,0+y,-ewidth +z};
+  float v7[]={width+x,height+y,-ewidth +z};
+  float v8[]={-width+x,height+y,-ewidth +z};
         
   float ver[]={
   v1[0],v1[1],v1[2],
@@ -231,14 +235,14 @@ void drawWall(float x,float y,float z){
 
 void vdrawWall(float x,float y,float z){
      // float ewidth=0.1,height=2,width=1;
-  float v1[]={ewidth/2,0,width};
-  float v2[]={ewidth/2,0,-width};
-  float v3[]={ewidth/2,height,-width};
-  float v4[]={ewidth/2,height,width};
-  float v5[]={-ewidth/2,0,width};
-  float v6[]={-ewidth/2,0,-width};
-  float v7[]={-ewidth/2,height,-width};
-  float v8[]={-ewidth/2,height,width};
+  float v1[]={ewidth +x,0+y,width+z};
+  float v2[]={ewidth +x,0+y,-width+z};
+  float v3[]={ewidth +x,height+y,-width+z};
+  float v4[]={ewidth +x,height+y,width+z};
+  float v5[]={-ewidth +x,0+y,width+z};
+  float v6[]={-ewidth +x,0+y,-width+z};
+  float v7[]={-ewidth +x,height+y,-width+z};
+  float v8[]={-ewidth +x,height+y,width+z};
         
   float ver[]={
   v1[0],v1[1],v1[2],
@@ -263,6 +267,61 @@ void vdrawWall(float x,float y,float z){
   v8[0],v8[1],v8[2],
  };
  Settex_ver_loop(edge,2);
+}
+//vertical vertical to axis x
+void drawWalls(float *offset,int count,bool isVertical){
+    if(isVertical){
+        for(int i=0;i<count;i++){
+            int j=i*3;
+            vdrawWall(offset[j+0],offset[j+1],offset[j+2]);
+        }
+    }
+    else{
+         for(int i=0;i<count;i++){
+            int j=i*3;
+            drawWall(offset[j+0],offset[j+1],offset[j+2]);
+        }
+    }
+
+}
+//float ewidth=0.1,height=2,width=1;
+int i_w=3;
+int j_w=3;
+void drawWallMap(vector<int> &vertices){
+    int count=vertices.size()/3;
+    int * index=vertices.data();
+    //cout<<count<<std::endl;
+    //int index[]={0,0,0, 2,02,0, 0,0,-2, 2,0,0, 2,0,-2};
+    float *vertice=(float*)malloc(sizeof(float)*count*3);
+    float xoffset=ewidth,zoffset=-width;
+    for(int i=0;i<count;i++){
+        int j=i*3;
+        vertice[j+0]=xoffset+index[j+0]*width*2;
+        vertice[j+1]=0;
+        vertice[j+2]=zoffset+index[j+2]*width*2;
+    }
+    drawWalls(vertice,count,true);
+
+}
+
+void createMap(){
+    static bool first=true;
+    static vector<int> &vertices=*(new vector<int>());
+    if(first){
+    first=false;
+    randomMaze();
+    for(int i=0;i<wid ;i++){
+        for(int j=0;j<wid ;j++){
+            if(dun[i][j]!='1'){
+                vertices.push_back(i);
+                vertices.push_back(0);
+                vertices.push_back(-j);
+            }    
+        }
+    }
+    }
+    drawWallMap(vertices);
+    
 }
 /*
 void display() {

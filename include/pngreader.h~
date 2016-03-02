@@ -18,6 +18,4 @@ void drawWall(float x,float y,float z);
 void vdrawWall(float x,float y,float z);
 
 void drawWallMap(std::vector<int> &in);
-
-void createMap();
 #endif

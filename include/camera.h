@@ -108,12 +108,12 @@ void yaw(float angle);
 void slide(float du, float dv, float dn);
 float getDist();
 void setShape(float viewAngle,float aspect,float Near,float Far);
-
+void trySlide(float du, float dv, float dn);
 
 //private:
 public:
 /* 摄像机属性 */
-Point3         eye,look,up;
+Point3         tryeye,eye,look,up;
 Vector3        u,v,n;
 float          viewAngle, aspect, nearDist, farDist;
 void           setModelViewMatrix();

@@ -8,13 +8,16 @@
 using namespace std;
  extern GLubyte checkImage[checkImageHeight][checkImageWidth][4];
  extern GLuint texName;
+ extern float ewidth ,height ,width ;
+ extern char dun[500][500];
+ bool collision_test(float du, float dv, float dn);
 /*
 http://blog.csdn.net/hobbit1988/article/details/7956838
 */
 
 /*
 g++ main.cpp camera.cpp -Iinclude -lGL -lglut -lGLU
-g++ main.cpp camera.cpp pngreader.cpp checkimage.cpp-lpng -Iinclude -lGL -lglut -lGLU
+g++ main.cpp camera.cpp pngreader.cpp checkimage.cpp randomMaze.cpp -lpng -Iinclude -lGL -lglut -lGLU
 */
 static int shoulder = 0, elbow = 0;  
 static int nearplane=1;
@@ -32,7 +35,7 @@ void init(void)
 }  
   void display(void)  
 {  
-    //camera.roll(0);
+    camera.roll(0);
    glEnable(GL_DEPTH_TEST);
    glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -85,25 +88,18 @@ void init(void)
  // glEnable(GL_CULL_FACE);
 //GL_FRONT,GL_BACK,GL_FRONT_AND_BACK
  //   glCullFace(GL_BACK);
-    
+    //drawWallMap();
+    createMap();
+    /*
     if(third){
     if(first)
-    //vdrawWall();
     drawWall(0,0,0);
     if(second)
-    //drawWall(1,0,-1);
     vdrawWall(0,0,0);
     }
-    else {
-    if(second)
-    drawWall(1,0,-1);
-    //drawWall();
-    if(first)
-    drawWall(0,0,0);
-    //vdrawWall();
-    }
+    */
     
-  glPopMatrix();
+ // glPopMatrix();
   glutSwapBuffers(); 
     
 }  
@@ -128,26 +124,31 @@ void keyboard (unsigned char key, int x, int y)
     float slidestep=0.1; 
    switch (key) {
         case 'w':
+        if(collision_test(0,0,-slidestep)){
          camera.slide(0,0,-slidestep); 
          glutPostRedisplay();
-         
+         }
          break; 
          
          case 'a':
+         if(collision_test(-slidestep,0,0)){
          camera.slide(-slidestep,0,0);
          glutPostRedisplay( );
-          
+          }
          break;
          
          case 'd':
+          if(collision_test(slidestep,0,0)){
          camera.slide(slidestep,0,0);
          glutPostRedisplay( );
-          
+          }
          break;
          
          case 's':
+          if(collision_test(0,0,slidestep )){
          camera.slide(0,0,slidestep); 
          glutPostRedisplay();
+         }
          break;
          
          case '1':
@@ -179,17 +180,18 @@ void mouse(int button ,int state,int x, int y){
     static int ddx,ddy,udx,udy;
     if(button == GLUT_LEFT_BUTTON){
         if(state ==GLUT_DOWN){
-            cout<<"down "<< x<<" "<<y<<endl;
+            //cout<<"down "<< x<<" "<<y<<endl;
             ddx=x;
             ddy=y;
         }
         else if(state == GLUT_UP){
-            cout<<"up " << x << " " <<y<<endl;
+            //cout<<"up " << x << " " <<y<<endl;
             int dx,dy;
             dx=x-ddx;
             dy=y-ddy;
-            RotateX(dx);  
-            RotateY(dy); 
+            camera.yaw(-dx/10);
+          //  RotateX(dx/10);  
+            //RotateY(dy); 
             glutPostRedisplay();
         }
     }
@@ -216,7 +218,7 @@ void RotateX(float angle)
     Camera &cam=camera;
     float d=cam.getDist();  
     cout<<"d "<<d<<endl;
-    int cnt=100;  
+    int cnt=1000;  
     float theta=angle/cnt;  
     float slide_d=-2*d*sin(theta*3.14159265/360);  
     cam.yaw(theta/2);              
@@ -249,7 +251,11 @@ void  RotateY(float angle)
 
 int main(int argc, char** argv)  
 {  
-camera.setCamera( 0, 0, 2,0, 0, 0, 0, 1, 2); 
+//camera.setCamera( 0, 0, 2,0, 0, 0, 0, 1, 2); 
+    float sx=width*2+0+width;
+    float sy=0.6;
+    float sz=0-width*2-width;
+camera.setCamera( sx, sy, sz,sx, sy, sz-1, sx, 1+sy, sz); 
    glutInit(&argc, argv);  
    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB|GLUT_DEPTH);  
    glutInitWindowSize (500, 500);   
@@ -265,3 +271,16 @@ camera.setCamera( 0, 0, 2,0, 0, 0, 0, 1, 2);
    glutMainLoop();  
    return 0;  
 } 
+bool collision_test(float du, float dv, float dn){
+    float curx,curz;
+    camera.trySlide(  du*3,   dv*3,   dn*3);
+    int i=camera.tryeye.x/2;
+    int j=camera.tryeye.z/-2;
+    if(dun[i][j]=='1'){
+         
+        return true;
+    }
+    
+     
+    return false;   
+}
